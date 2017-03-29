@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1490325122 source:/home/jimy/Dev/CG/HelloGL/main.c
+	<stdio.h>
+	<stdlib.h>
+	<GL/glut.h>
+
+1490718709 source:/home/jimy/Dev/CG/1 - Rato/main.c
+	<stdio.h>
+	<stdlib.h>
+	<GL/glut.h>
+	<math.h>
+
