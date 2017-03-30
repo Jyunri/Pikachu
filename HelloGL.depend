@@ -10,3 +10,10 @@
 	<GL/glut.h>
 	<math.h>
 
+1490886545 source:/home/jimy/Dev/CG/1 -  Rato/main.c
+	<stdio.h>
+	<stdlib.h>
+	<GL/glut.h>
+	<math.h>
+	<unistd.h>
+
