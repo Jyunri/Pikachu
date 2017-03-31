@@ -30,6 +30,7 @@ Fila *f;
 GLint N = 3;  //numero de coordenadas do rato
 GLfloat X1 = -.1, Y1 = 0, X2 = .1, Y2 = 0, X3 = 0 , Y3 = .1;
 GLfloat cx, cy;   //centro do rato
+GLfloat nx, ny;   //nariz do rato
 GLfloat ox[3], oy[3];   //origem do rato
 GLfloat rx[3], ry[3];
 GLfloat novo_qx, novo_qy;
@@ -37,8 +38,8 @@ GLfloat ultimo_qx, ultimo_qy;
 GLfloat dx, dy;
 GLfloat w = 500, h = 500, r = .0, g = .0, b = .0;
 GLint count = -1;
-GLfloat fator_de_escala = 1.2;
-GLfloat angle;
+GLfloat scale = 1;
+GLfloat theta = 0;
 
 GLfloat corpo_x = 0.12, corpo_y = 0.17;
 float tmp_x, tmp_y;
@@ -70,38 +71,53 @@ void desenha()
     glClearColor(1, 1, 1, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //desenha Triangulo teste
-//    glColor3f(255,255,0);
-//    glLineWidth(5.0);
-//
-//    glBegin(GL_TRIANGLES);
-//    for(int i = 0; i < N; i++)
-//    {
-//        glVertex2f(rx[i], ry[i]);
-//    }
-//    glEnd();
+    desenhaPikachu();
+    desenhaQueijo();
 
+    //forca inicializacao dos comandos
+    glFlush();
+}
+
+void desenhaPikachu()
+{
     //desenha corpo
-    float angulo;
+    float x_original, y_original,angulo, x_transformado, y_transformado;
     glColor3f(255,255,0);
     glLineWidth(5.0);
     glBegin(GL_POLYGON);
     for (int i=0; i<=50; i++)
     {
         angulo= 2 * PI * i / 50.0;
-        glVertex3f(cx+corpo_x*cos(angulo), cy+corpo_y*sin(angulo),0);
+        x_original = corpo_x*cos(angulo);
+        y_original = corpo_y*sin(angulo);
+        x_transformado = cos(theta)*scale*(x_original)-sin(theta)*scale*(y_original);
+        y_transformado = sin(theta)*scale*(x_original)+cos(theta)*scale*(y_original);
+        glVertex3f(cx+scale*x_transformado,cy+scale*y_transformado,0);
     }
     glEnd();
 
+
     //desenha nariz
     glColor3f(0,0,0);
-    glBegin(GL_POLYGON);
-    for (int i=0; i<=50; i++)
-    {
-        angulo= 2 * PI * i / 50.0;
-        glVertex3f(cx+0.008*cos(angulo), cy +0.008*sin(angulo)+0.14,0);
-    }
+    glPointSize(scale*3);
+    glBegin(GL_POINTS);
+        x_original = .002;
+        y_original = .14;
+        x_transformado = cos(theta)*scale*(x_original)-sin(theta)*scale*(y_original);
+        y_transformado = sin(theta)*scale*(x_original)+cos(theta)*scale*(y_original);
+
+        nx = cx+scale*x_transformado;
+        ny = cy+scale*y_transformado;
+
+        glVertex3f(cx+scale*x_transformado,cy+scale*y_transformado,0);
     glEnd();
+
+    //desenha reta do rato
+//    glColor3f(0,0,1);
+//    glBegin(GL_LINES);
+//        glVertex2f(nx,ny);
+//        glVertex2f(cx,cy);
+//    glEnd();
 
     //desenha olho esquerdo
     glColor3f(0,0,0);
@@ -109,7 +125,11 @@ void desenha()
     for (int i=0; i<=50; i++)
     {
         angulo= 2 * PI * i / 50.0;
-        glVertex3f(cx+0.015*cos(angulo)+0.04, cy +0.015*sin(angulo)+0.1,0);
+        x_original = 0.015*cos(angulo)+0.04;
+        y_original = 0.015*sin(angulo)+0.1;
+        x_transformado = cos(theta)*scale*(x_original)-sin(theta)*scale*(y_original);
+        y_transformado = sin(theta)*scale*(x_original)+cos(theta)*scale*(y_original);
+        glVertex3f(cx+scale*x_transformado,cy+scale*y_transformado,0);
     }
     glEnd();
 
@@ -119,7 +139,11 @@ void desenha()
     for (int i=0; i<=50; i++)
     {
         angulo= 2 * PI * i / 50.0;
-        glVertex3f(cx+0.015*cos(angulo)-0.04, cy +0.015*sin(angulo)+0.1,0);
+        x_original=0.015*cos(angulo)-0.04;
+        y_original=0.015*sin(angulo)+0.1;
+        x_transformado = cos(theta)*scale*(x_original)-sin(theta)*scale*(y_original);
+        y_transformado = sin(theta)*scale*(x_original)+cos(theta)*scale*(y_original);
+        glVertex3f(cx+scale*x_transformado,cy+scale*y_transformado,0);
     }
     glEnd();
 
@@ -130,7 +154,11 @@ void desenha()
     for (int i=0; i<=50; i++)
     {
         angulo= 2 * PI * i / 50.0;
-        glVertex3f(cx+0.015*cos(angulo)+0.07, cy +0.015*sin(angulo)+0.12,0);
+        x_original=0.015*cos(angulo)+0.07;
+        y_original=0.015*sin(angulo)+0.12;
+        x_transformado = cos(theta)*scale*(x_original)-sin(theta)*scale*(y_original);
+        y_transformado = sin(theta)*scale*(x_original)+cos(theta)*scale*(y_original);
+        glVertex3f(cx+scale*x_transformado,cy+scale*y_transformado,0);
     }
     glEnd();
 
@@ -140,82 +168,158 @@ void desenha()
     for (int i=0; i<=50; i++)
     {
         angulo= 2 * PI * i / 50.0;
-        glVertex3f(cx+0.015*cos(angulo)-0.07, cy +0.015*sin(angulo)+0.12,0);
+        x_original=0.015*cos(angulo)-0.07;
+        y_original=0.015*sin(angulo)+0.12;
+        x_transformado = cos(theta)*scale*(x_original)-sin(theta)*scale*(y_original);
+        y_transformado = sin(theta)*scale*(x_original)+cos(theta)*scale*(y_original);
+        glVertex3f(cx+scale*x_transformado,cy+scale*y_transformado,0);
     }
     glEnd();
 
+    /*PARTES NAO CIRCULARES*/
+
+    //arrays para armazenar pontos
+    float tmp_x[8], tmp_y[8];
+    float tmp_transformado_x[8], tmp_transformado_y[8];
+
+    //numero de pontos
+    float N;
+
+
     //desenha orelha direita
+    tmp_x[0] = -.15, tmp_y[0] = -.1;
+    tmp_x[1] = -.1, tmp_y[1] = .05;
+    tmp_x[2] = -.11, tmp_y[2] = -.05;
+
+    N = 3;
+
+    for(int i = 0; i<N; i++)
+    {
+        tmp_transformado_x[i] = cos(theta)*scale*(tmp_x[i])-sin(theta)*scale*(tmp_y[i]);
+        tmp_transformado_y[i] = sin(theta)*scale*(tmp_x[i])+cos(theta)*scale*(tmp_y[i]);
+    }
+
     glColor3f(0,0,0);
     glPointSize(3);
     glBegin(GL_TRIANGLES);
-        glVertex2f(-.15+cx,-.1+cy);
-        glVertex2f(-.1+cx,.05+cy);
-        glVertex2f(-.11+cx,-.05+cy);
+//        glVertex2f(cos(theta)*scale*(-.15)+cx,scale*(-.1)+cy);
+//        glVertex2f(cos(theta)*scale*(-.1)+cx,scale*(.05)+cy);
+//        glVertex2f(cos(theta)*scale*(-.11)+cx,scale*(-.05)+cy);
+
+    for(int i = 0; i <N; i++)
+    {
+        glVertex3f(cx+scale*tmp_transformado_x[i],cy+scale*tmp_transformado_y[i],0);
+    }
     glEnd();
 
     //desenha orelha esquerda
+    tmp_x[0] = .15, tmp_y[0] = -.1;
+    tmp_x[1] = .1, tmp_y[1] = .05;
+    tmp_x[2] = .11, tmp_y[2] = -.05;
+
+    N = 3;
+
+    for(int i = 0; i<N; i++)
+    {
+        tmp_transformado_x[i] = cos(theta)*scale*(tmp_x[i])-sin(theta)*scale*(tmp_y[i]);
+        tmp_transformado_y[i] = sin(theta)*scale*(tmp_x[i])+cos(theta)*scale*(tmp_y[i]);
+    }
     glColor3f(0,0,0);
     glPointSize(3);
     glBegin(GL_TRIANGLES);
-        glVertex2f(.15+cx,-.1+cy);
-        glVertex2f(.1+cx,.05+cy);
-        glVertex2f(.11+cx,-.05+cy);
+    for(int i = 0; i <N; i++)
+    {
+        glVertex3f(cx+scale*tmp_transformado_x[i],cy+scale*tmp_transformado_y[i],0);
+    }
     glEnd();
 
     //desenha listra 1
+    tmp_x[0] = .07, tmp_y[0] = .0;
+    tmp_x[1] = -.07, tmp_y[1] = .0;
+    tmp_x[2] = .0, tmp_y[2] = -.02;
+
+    N = 3;
+
+    for(int i = 0; i<N; i++)
+    {
+        tmp_transformado_x[i] = cos(theta)*scale*(tmp_x[i])-sin(theta)*scale*(tmp_y[i]);
+        tmp_transformado_y[i] = sin(theta)*scale*(tmp_x[i])+cos(theta)*scale*(tmp_y[i]);
+    }
+
     glColor3f(.8,.6,0);
     glPointSize(3);
     glBegin(GL_POLYGON);
-        glVertex2f(.07+cx,.0+cy);
-        glVertex2f(-.07+cx,0+cy);
-        glVertex2f(0+cx,-.02+cy);
+    for(int i = 0; i <N; i++)
+    {
+        glVertex3f(cx+scale*tmp_transformado_x[i],cy+scale*tmp_transformado_y[i],0);
+    }
     glEnd();
 
     //desenha listra 2
+    tmp_x[0] = .07, tmp_y[0] = -.05;
+    tmp_x[1] = -.07, tmp_y[1] = -.05;
+    tmp_x[2] = .0, tmp_y[2] = -.07;
+
+    N = 3;
+
+    for(int i = 0; i<N; i++)
+    {
+        tmp_transformado_x[i] = cos(theta)*scale*(tmp_x[i])-sin(theta)*scale*(tmp_y[i]);
+        tmp_transformado_y[i] = sin(theta)*scale*(tmp_x[i])+cos(theta)*scale*(tmp_y[i]);
+    }
+
     glColor3f(.8,.6,0);
     glPointSize(3);
     glBegin(GL_POLYGON);
-        glVertex2f(.07+cx,-.05+cy);
-        glVertex2f(-.07+cx,-.05+cy);
-        glVertex2f(0+cx,-.07+cy);
+    for(int i = 0; i <N; i++)
+    {
+        glVertex3f(cx+scale*tmp_transformado_x[i],cy+scale*tmp_transformado_y[i],0);
+    }
     glEnd();
 
     //desenha rabo
+    tmp_x[0] = -.04, tmp_y[0] = -.16;
+    tmp_x[1] = -.07, tmp_y[1] = -.19;
+    tmp_x[2] = -.025, tmp_y[2] = -.22;
+    tmp_x[3] = -.07, tmp_y[3] = -.26;
+
+    tmp_x[4] = .0, tmp_y[4] = -.26;
+    tmp_x[5] = .025, tmp_y[5] = -.22;
+    tmp_x[6] = .0, tmp_y[6] = -.19;
+    tmp_x[7] = .04, tmp_y[7] = -.17;
+
+    N = 8;
+
+    for(int i = 0; i<N; i++)
+    {
+        tmp_transformado_x[i] = cos(theta)*scale*(tmp_x[i])-sin(theta)*scale*(tmp_y[i]);
+        tmp_transformado_y[i] = sin(theta)*scale*(tmp_x[i])+cos(theta)*scale*(tmp_y[i]);
+    }
+
     glColor3f(255,255,0);
     glPointSize(3);
     glBegin(GL_POLYGON);
-        glVertex2f(-.04+cx,-.16+cy);
-        glVertex2f(-.07+cx,-.19+cy);
-        glVertex2f(-0.025+cx,-.22+cy);
-        glVertex2f(-.07+cx,-.26+cy);
-
-        glVertex2f(.0+cx,-.26+cy);
-        glVertex2f(0.025+cx,-.22+cy);
-        glVertex2f(.0+cx,-.19+cy);
-        glVertex2f(.04+cx,-.16+cy);
+    for(int i = 0; i <N; i++)
+    {
+        glVertex3f(cx+scale*tmp_transformado_x[i],cy+scale*tmp_transformado_y[i],0);
+    }
     glEnd();
+}
 
-    //desenha Queijo
+void desenhaQueijo()
+{
     glColor3f(255,255,0);
     glPointSize(8);
     glBegin(GL_POINTS);
     int i;
-
     No *tmp = f->inicio;
     while(tmp!=NULL)
     {
-        printf("Desenhando queijo na posicao (%.3f,%.3f)\n",tmp->c.qx,tmp->c.qy);
+        //printf("Desenhando queijo na posicao (%.3f,%.3f)\n",tmp->c.qx,tmp->c.qy);
         glVertex2d(tmp->c.qx,tmp->c.qy);
         tmp = tmp->prox;
     }
-//    for(i = 0; i <= count; i++)
-//    {
-//        glVertex2f(novo_qx,novo_qy);
-//    }
     glEnd();
-
-    //forca inicializacao dos comandos
-    glFlush();
 }
 
 void moveRato()
@@ -223,54 +327,38 @@ void moveRato()
     printf("procurando queijo\n");
     exibeFila(f);
     printf("\n");
-    if(removeNo(f))
+    while(getFirst(f))
     {
         printf("Movendo (%d,%d)\n",dx,dy);
-        //rodaRato(); //roda de acordo com a posicao do queijo
-        cx+= dx;
-        cy+= dy;
-
-
-        for(int i = 0; i < N; i ++)
+        for(int i = 0; i < 20; i++)
         {
-            rx[i]+= dx;
-            ry[i]+= dy;
-            glutPostRedisplay();
+            cx+= dx/20;
+            cy+= dy/20;
+            nx+= dx/20;
+            ny+= dy/20;
+            desenha();
+            usleep(1000*50);
+            glFlush();
         }
-
+        removeNo(f);
     }
 }
 
 void rodaRato()
 {
     //todo definir o angulo certo
-    GLfloat m = (ry[3]-cy)/(rx[3]-cx);    //coeficiente angular do rato
-    GLfloat n = (novo_qy-cy)/(novo_qx-cx);
-    angle = atan(abs((m-n)/(1+(m*n))));
-    printf("m:%f n:%f, angulo: %f\n",m,n,angle);
+    GLfloat mr = (ny-cy)/(nx-cx);    //coeficiente angular do rato
+    GLfloat mq = (f->inicio->c.qy-cy)/(f->inicio->c.qx-cx);
+    float alfa = atan(((mq-mr)/(1+(mq*mr))));
+    printf("m:%f n:%f, angulo: %f\n",mr,mq,alfa);
 
-    angle = toRadian(90);
-
-    /*rotaciona triangulo
-    for(int i = 0; i < N; i ++)
+    while(theta < alfa)
     {
-        float x = rx[i], y = ry[i];
-        //printf("p%d: (%f,%f), c%d:(%f,%f)\n",i,rx[i],ry[i],i,cx[i],cy[i]);
-        rx[i] =cx + ((x-cx) * cos(angle) - (y-cy) * sin(angle)); //+ (rx[i]-ox[i]);
-        ry[i] =cy + ((x-cx) * sin(angle) + (y-cy) * cos(angle)); //+ (ry[i]-oy[i]);
-        //printf("pnovo%d: (%f,%f)\n\n",i,rx[i],ry[i]);
+        theta+=toRadian(10);
+        desenha();
+        usleep(1000*50);
+        glFlush();
     }
-    */
-
-    float x = corpo_x, y = corpo_y;
-    //printf("p%d: (%f,%f), c%d:(%f,%f)\n",i,rx[i],ry[i],i,cx[i],cy[i]);
-    corpo_x = cx + ((x-cx) * cos(angle) - (y-cy) * sin(angle)); //+ (rx[i]-ox[i]);
-    corpo_y = cy + ((x-cx) * sin(angle) + (y-cy) * cos(angle)); //+ (ry[i]-oy[i]);
-
-
-    //translada o rato para o ponto original
-
-
 
 }
 
@@ -280,22 +368,12 @@ void escalaRato (unsigned char key, int x, int y)
     switch(key)
     {
     case '+':
-        for(int i = 0; i<N; i++)
-        {
-            rx[i] = (rx[i]-cx)* fator_de_escala + cx;
-            ry[i] = (ry[i]-cy)* fator_de_escala + cy;
-        }
-        corpo_x = (corpo_x-cx)*fator_de_escala + cx;
-        corpo_y = (corpo_y-cy)*fator_de_escala + cy;
+        if(scale<5)
+            scale+=.2;
         break;
     case '-':
-        for(int i = 0; i<N; i++)
-        {
-            rx[i] = (rx[i]-cx)*1/fator_de_escala + cx;
-            ry[i] = (ry[i]-cy)*1/fator_de_escala + cy;
-        }
-        corpo_x = (corpo_x-cx)*1/fator_de_escala + cx;
-        corpo_y = (corpo_y-cy)*1/fator_de_escala + cy;
+        if(scale>.2)
+            scale-=.2;
         break;
 
     //teste: move para origem
@@ -304,11 +382,14 @@ void escalaRato (unsigned char key, int x, int y)
         tmp_y = cy;
         cx = 0;
         cy = 0;
-        corpo_x = (corpo_x-cx)*fator_de_escala;
-        corpo_y = (corpo_y-cy)*fator_de_escala;
+        corpo_x = (corpo_x-cx)*scale;
+        corpo_y = (corpo_y-cy)*scale;
         cx = tmp_x;
         cy = tmp_y;
 
+    //teste: roda rato
+    case 'r':
+        theta+=toRadian(90);
 
     //teste: faz o rato correr atras do queijo apenas quando ele teclar
     case 'm':
@@ -335,11 +416,14 @@ void posicionaQueijo (int botao, int estado, int x, int y)
             insereNo(f);
             exibeFila(f);
 
-            //rodaRato();
+            rodaRato();
 
             //TODO - tem que fazer o rato mover aos poucos
-            //moveRato(); //leva o rato ate o queijo criado
+            moveRato(); //leva o rato ate o queijo criado
         }
+        break;
+    case GLUT_RIGHT_BUTTON:
+        moveRato();
         break;
     default:
         break;
@@ -401,6 +485,24 @@ void insereNo(Fila *f)
     f->tamanho++;
 }
 
+//recebe primeiro elemento da fila mas nao desenfileira
+int getFirst(Fila *f)
+{
+    if(vazia(f))
+    {
+        printf("Fila vazia! Acabou queijos!\n");
+        return 0;
+    }
+    No *tmp = f->inicio;
+
+    //recebe distancia entre primeiro queijo da fila e o ultimo queijo
+    dx = tmp->c.qx - ultimo_qx;
+    dy = tmp->c.qy - ultimo_qy;
+
+    return 1;
+
+}
+
 int removeNo(Fila *f)
 {
     if(vazia(f))
@@ -413,8 +515,8 @@ int removeNo(Fila *f)
         No *tmp = f->inicio;
 
         //recebe distancia entre primeiro queijo da fila e o ultimo queijo
-        dx = tmp->c.qx - ultimo_qx;
-        dy = tmp->c.qy - ultimo_qy;
+        //dx = tmp->c.qx - ultimo_qx;
+        //dy = tmp->c.qy - ultimo_qy;
 
         //ultimo queijo passa a ser o primeiro da fila
         ultimo_qx = tmp->c.qx;
@@ -443,16 +545,8 @@ int main(int argc, char *argv[ ] )
     //centro do rato
     cx = 0, cy = 0;
 
-
-    //origem para o rato
-    ox[0] = -.1, oy[0] = 0;
-    ox[1] = .1, oy[1] = 0;
-    ox[2] = 0 , oy[2] = .1;
-
-    //posicao inicial do rato
-    rx[0] = -.1, ry[0] = 0;
-    rx[1] = .1, ry[1] = 0;
-    rx[2] = 0 , ry[2] = .1;
+    //nariz do rato
+    nx = .002, ny = .14;
 
     f = (Fila*)malloc(sizeof(Fila));
     iniciaFila(f);
