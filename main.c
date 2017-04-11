@@ -46,23 +46,12 @@ float tmp_x, tmp_y;
 
 float toRadian(float grau)
 {
-    return grau*M_PI/180;
+    return grau*PI/180;
 }
 
-void SpecialKeys (int key, int x, int y)
+float toDegree(float radian)
 {
-    switch(key)
-    {
-    case GLUT_KEY_LEFT:
-    case GLUT_KEY_UP:
-        glShadeModel(GL_SMOOTH);
-        break;
-    case GLUT_KEY_RIGHT:
-    case GLUT_KEY_DOWN:
-        glShadeModel(GL_FLAT);
-        break;
-    }
-    glutPostRedisplay();
+    return 180*radian/PI;
 }
 
 void desenha()
@@ -71,12 +60,25 @@ void desenha()
     glClearColor(1, 1, 1, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    desenhaPikachu();
+    //desenhaPikachu();
+    desenhaPikachu3D();
     desenhaQueijo();
+
 
     //forca inicializacao dos comandos
     glFlush();
 }
+
+void desenhaPikachu3D()
+{
+    //desenha corpo
+    glColor3f(255,255,0);
+    //glScalef(0.5, 1.0, 1.0);
+    glutWireSphere(0.5f,1,1);
+
+
+}
+
 
 void desenhaPikachu()
 {
@@ -96,7 +98,6 @@ void desenhaPikachu()
     }
     glEnd();
 
-
     //desenha nariz
     glColor3f(0,0,0);
     glPointSize(scale*3);
@@ -113,11 +114,18 @@ void desenhaPikachu()
     glEnd();
 
     //desenha reta do rato
-//    glColor3f(0,0,1);
-//    glBegin(GL_LINES);
-//        glVertex2f(nx,ny);
-//        glVertex2f(cx,cy);
-//    glEnd();
+    glColor3f(0,0,1);
+    glBegin(GL_LINES);
+        glVertex2f(nx,ny);
+        glVertex2f(cx,cy);
+    glEnd();
+
+    //desenha reta do queijo
+    glColor3f(1,0,0);
+    glBegin(GL_LINES);
+        glVertex2f(novo_qx,novo_qy);
+        glVertex2f(cx,cy);
+    glEnd();
 
     //desenha olho esquerdo
     glColor3f(0,0,0);
@@ -344,20 +352,65 @@ void moveRato()
     }
 }
 
+float distance(float x1, float x2, float y1, float y2){
+    return sqrt(pow((x1-x2),2)+pow((y1-y2),2));
+}
+
 void rodaRato()
 {
     //todo definir o angulo certo
     GLfloat mr = (ny-cy)/(nx-cx);    //coeficiente angular do rato
-    GLfloat mq = (f->inicio->c.qy-cy)/(f->inicio->c.qx-cx);
+    GLfloat mq = (f->inicio->c.qy-cy)/(f->inicio->c.qx-cx); //coeficiente angular do queijo
     float alfa = atan(((mq-mr)/(1+(mq*mr))));
-    printf("m:%f n:%f, angulo: %f\n",mr,mq,alfa);
+    printf("m:%f n:%f, angulo: %f\n",mr,mq,toDegree(alfa));
 
-    while(theta < alfa)
+    float tmp_angle = 0;
+
+    //garante que ele nao ande de costaas
+    float nx_rotacionado, ny_rotacionado, distancia_queijo_nariz;
+    nx_rotacionado = nx*cos(alfa) - ny*sin(alfa);
+    ny_rotacionado = nx*sin(alfa) + ny*cos(alfa);
+    distancia_queijo_nariz = distance(nx_rotacionado,f->inicio->c.qx,ny_rotacionado,f->inicio->c.qy);
+
+    float nx_rotacionado_suplementar, ny_rotacionado_suplementar, distancia_suplementar_queijo_nariz;
+    float alfa_suplementar;
+    //alfa_suplementar = alfa>0?(PI)-alfa:alfa + PI;
+    alfa_suplementar = PI-alfa;
+
+    nx_rotacionado_suplementar = nx*cos(alfa_suplementar) - ny*sin(alfa_suplementar);
+    ny_rotacionado_suplementar = nx*sin(alfa_suplementar) + ny*cos(alfa_suplementar);
+    distancia_suplementar_queijo_nariz = distance(nx_rotacionado_suplementar,f->inicio->c.qx,ny_rotacionado_suplementar,f->inicio->c.qy);
+
+    printf("nx_rotacionado: %f, nx_rotacionado_suplementar: %f\n",nx_rotacionado,nx_rotacionado_suplementar);
+    printf("distancia: %f\n",distancia_queijo_nariz);
+    printf("distancia suplementar: %f\n",distancia_suplementar_queijo_nariz);
+
+    if(distancia_queijo_nariz>distancia_suplementar_queijo_nariz){
+       //alfa = alfa_suplementar;
+       printf("suplementar: %f\n",toDegree(alfa));
+    }
+
+    while(tmp_angle < alfa)
     {
+        printf("theta: %f\n",toDegree(theta));
         theta+=toRadian(10);
+        tmp_angle+=toRadian(10);
         desenha();
         usleep(1000*50);
         glFlush();
+    }
+    if(alfa < 0)
+    {
+        while(tmp_angle > alfa)
+        {
+            printf("theta: %f\n",toDegree(theta));
+            theta-=toRadian(10);
+            tmp_angle-=toRadian(10);
+            desenha();
+            usleep(1000*50);
+            glFlush();
+        }
+
     }
 
 }
@@ -408,8 +461,15 @@ void posicionaQueijo (int botao, int estado, int x, int y)
         if(estado == GLUT_DOWN)
         {
             count++;
+
             novo_qx = ((float)x/((float)w/2.0))-1.0;
             novo_qy = (float) 1 - y/(h/2.0);
+
+            if(novo_qx>.7)  novo_qx = .7;
+            else if(novo_qx<-.7) novo_qx = -.7;
+
+            if(novo_qy>.7)  novo_qy = .7;
+            else if(novo_qy<-.7) novo_qy = -.7;
 
             //Insere a posicao do queijo na Fila
             printf("Tentando inserir queijo na posicao (%.3f,%.3f)\n",novo_qx,novo_qy);
@@ -555,11 +615,11 @@ int main(int argc, char *argv[ ] )
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowPosition(50,100);
     glutInitWindowSize(w,h);
-    glutCreateWindow("Exercicio 1");
+    glutCreateWindow("Pikachu");
     glutDisplayFunc(desenha);
     glutMouseFunc(posicionaQueijo);
     glutKeyboardFunc(escalaRato);
-    glutSpecialFunc(SpecialKeys);
+    //glutSpecialFunc(SpecialKeys);
     glutMainLoop ();
 
     free(f);

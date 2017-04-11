@@ -10,10 +10,23 @@
 	<GL/glut.h>
 	<math.h>
 
-1490983113 source:/home/jimy/Dev/CG/1 -  Rato/main.c
+1491002089 source:/home/jimy/Dev/CG/1 -  Rato/main.c
 	<stdio.h>
 	<stdlib.h>
 	<GL/glut.h>
+	<math.h>
+	<unistd.h>
+
+1491671158 source:/home/jimy/Dev/CG/2 -  Rato 3D/main.c
+	<stdio.h>
+	<stdlib.h>
+	<GL/glut.h>
+	<math.h>
+	<unistd.h>
+
+1491891339 source:/home/jimy/Dev/CG/2 -  Rato 3D/pikachu3d.c
+	<GL/glut.h>
+	<stdlib.h>
 	<math.h>
 	<unistd.h>
 

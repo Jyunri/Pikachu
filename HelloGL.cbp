@@ -17,6 +17,7 @@
 				<Linker>
 					<Add option="-lGL" />
 					<Add option="-lglut" />
+					<Add option="-lGLU" />
 					<Add directory="/usr/include/GL" />
 				</Linker>
 			</Target>
@@ -36,7 +37,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Unit filename="pikachu3d.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

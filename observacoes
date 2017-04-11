@@ -1,0 +1,44 @@
+Pontos observados durante a implementacao da tarefa:
+
+
+1. O tamanho dos objetos sempre devem ser < 1
+	Ex: glutWiredCube(0.8f);
+
+2. A ordem das transformacoes IMPORTA MTO
+
+	ANTES
+    glRotatef(angx,1.0,0.0,0.0);
+    glRotatef(angy,0.0,1.0,0.0);
+    glRotatef(angz,0.0,0.0,1.0);
+    glScalef(scale,scale,scale);
+    glTranslatef(translada_x,translada_y,translada_z);
+
+
+	DEPOIS
+	glTranslatef(translada_x,translada_y,translada_z);
+    glRotatef(angx,1.0,0.0,0.0);
+    glRotatef(angy,0.0,1.0,0.0);
+    glRotatef(angz,0.0,0.0,1.0);
+    glScalef(scale,scale,scale);
+
+
+    Hipotese: A translacao estava sendo feita antes da escala e rotacao (visto que o OGL armazena as transformacoes em uma pilha). Como a escala e a rotacao utilizam a origem como referencial, elas estavam sendo feitas de forma incorreta.
+
+
+//todo
+
+//            Desenha boca
+//            glColor3f(0,0,0);
+//            glPushMatrix();
+//                glScalef(.7,.7,.7);
+//                glTranslatef(-1,-.05,0);
+//                glRotatef(90,0,1,0);
+//                glRotatef(180,1,0,0);
+//                glBegin(GL_POLYGON);
+//                GLfloat angle;
+//                for (int i=0;i<=10;i++) {
+//                    angle = PI * i / 10.0;
+//                    glVertex2f(0.1*cos(angle), 0.1*sin(angle));
+//                    }
+//                glEnd();
+//            glPopMatrix();
